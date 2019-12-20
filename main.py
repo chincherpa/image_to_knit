@@ -3,9 +3,10 @@ import random
 from PIL import Image
 
 file_list = []
-for i in os.listdir("."):
-    if i.endswith(".jpg") or i.endswith(".png"):
-        file_list.append(i)
+for filename in os.listdir("."):
+    if filename.endswith(".jpg") or filename.endswith(".png"):
+        if "result" not in filename:
+            file_list.append(filename)
 
 n = 38
 if len(file_list) > 1:
@@ -19,13 +20,22 @@ CONST = 32
 SIZE = 9
 
 filename = IMAGE.split(".")[0]
-result_image = f"{filename}_{CONST}_{SIZE}.jpg"
+result_image = f"{filename}_result_{CONST}_{SIZE}.jpg"
 img = Image.open(IMAGE)
 rgb_im = img.convert("RGB")
 width, height = rgb_im.size
 
 # image auf eine durch SIZE teilbare Größe schneiden
 rgb_im.crop((0, 0, width // SIZE, height // SIZE))
+
+# durchschnittsfarbe
+img2 = rgb_im.resize((1, 1))
+
+color = img2.getpixel((0, 0))
+print('#{:02x}{:02x}{:02x}'.format(*color))
+
+avrg_color = (255, 255, 255)  # img2.getpixel((0, 0))
+print(avrg_color)
 
 for x in range(0, width, SIZE):
     for y in range(0, height, SIZE):
@@ -35,7 +45,7 @@ for x in range(0, width, SIZE):
         new_g = (g // CONST) * CONST
         new_b = (b // CONST) * CONST
 
-        knot = Image.new("RGB", (9, 9), (11, 17, 65))
+        knot = Image.new("RGB", (9, 9), (avrg_color))
 
         knot.putpixel((0, 2), (new_r, new_g, new_b))
         knot.putpixel((1, 1), (new_r, new_g, new_b))
